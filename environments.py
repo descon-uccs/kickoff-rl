@@ -21,13 +21,15 @@ class GridWorld :
     
     def __init__(self,width) :
         
+        self.width = width
+        
         self.reset()
         
     def reset(self) :
         '''
         This method sets self.state to the initial state and then return the current state
         '''
-        self.state = None ## edit this line of code!
+        self.state = self.width - 1 ## edit this line of code!
         return self.state
     
     def step(self,action) :
@@ -39,9 +41,25 @@ class GridWorld :
             - boolean: True if terminated, False if not terminated
         '''
         
+        # state propagation
+        motion = action - 1
+        
+        newState = max(0, 
+                       min(self.width-1, self.state+motion))
+        
         reward = 0
+        if newState == 0 :
+            reward += 10
+        if action == self.LEFT or action== self.RIGHT :
+            reward -= 1
+        
+        
         done = False
+        if newState == 0 :
+            done = True
             
+        self.state = newState
+        
         return self.state, reward, done
     
     
@@ -186,16 +204,22 @@ if __name__ == '__main__' :
     gw = GridWorld(5)
     print(gw.reset())
     
-    sample_actions = [0,0,1,2,0,0,0]
+    sample_actions = [0,0,1,2,0,0,0,0,1]
+    cumulative_reward = 0
     for action in sample_actions :
-        print(gw.step(action))
+        state,rew,done = gw.step(action)
+        print((state,rew,done))
+        cumulative_reward += rew
+        if done :
+            break
+    print(cumulative_reward)
     
     
-if __name__ == '__main__' :
+# if __name__ == '__main__' :
     
-    gwi = GridWorldInertial(5)
-    print(gwi.reset())
+#     gwi = GridWorldInertial(5)
+#     print(gwi.reset())
     
-    sample_actions_gwi = [0,0,2,2,1,1,0,1,1,1,1]
-    for action in sample_actions_gwi :
-        print(gwi.step(action))
+#     sample_actions_gwi = [0,0,2,2,1,1,0,1,1,1,1]
+#     for action in sample_actions_gwi :
+#         print(gwi.step(action))
