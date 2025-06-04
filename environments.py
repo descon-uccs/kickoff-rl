@@ -4,7 +4,9 @@ Created on Mon Jun  2 15:15:50 2025
 
 @author: phili
 """
-
+# new imports:
+import gymnasium as gym
+from gymnasium import spaces
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,24 +15,33 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 
 
-class GridWorld :
+class GridWorld(gym.Env) :
+    
+    metadata = {"render_modes": ['rgb_array']}
     
     LEFT = 0
     COAST = 1
     RIGHT = 2
     
-    def __init__(self,width) :
+    def __init__(self,  width=5, render_mode="rgb_array") :
+        
+        self.render_mode = render_mode
         
         self.width = width
         
+        self.action_space = spaces.Discrete(3) # the three actions
+        
+        # equal to state space
+        self.observation_space = spaces.Discrete(self.width)
+        
         self.reset()
         
-    def reset(self) :
+    def reset(self, seed=None, options=None) :
         '''
         This method sets self.state to the initial state and then return the current state
         '''
         self.state = self.width - 1 ## edit this line of code!
-        return self.state
+        return self.state, {}
     
     def step(self,action) :
         '''
@@ -60,7 +71,8 @@ class GridWorld :
             
         self.state = newState
         
-        return self.state, reward, done
+        # returns observation, reward, terminated, truncated, info dict
+        return self.state, reward, done, False, {}
     
     
     def render(self, mode='rgb_array'):
@@ -207,7 +219,7 @@ if __name__ == '__main__' :
     sample_actions = [0,0,1,2,0,0,0,0,1]
     cumulative_reward = 0
     for action in sample_actions :
-        state,rew,done = gw.step(action)
+        state,rew,done,_,_ = gw.step(action)
         print((state,rew,done))
         cumulative_reward += rew
         if done :
